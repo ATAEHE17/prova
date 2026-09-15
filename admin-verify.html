@@ -115,6 +115,16 @@
 </head>
 
 <body class="login-page">
+    <script>
+        // TEMP DEBUG — shows any JS error as a plain popup so it's visible on
+        // mobile too (no devtools needed). Safe to remove once the bug's found.
+        window.onerror = function (msg, url, line, col) {
+            alert('حصل خطأ برمجي:\n' + msg + '\nفي: ' + url + '\nسطر: ' + line + ':' + col);
+        };
+        window.addEventListener('unhandledrejection', function (e) {
+            alert('حصل خطأ (promise):\n' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+        });
+    </script>
     <div class="verify-wrap">
         <div class="login-card card">
             <div class="hero">
