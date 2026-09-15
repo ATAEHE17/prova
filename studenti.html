@@ -1307,53 +1307,6 @@
       color: #ef5a72;
     }
 
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--card-2);
-    }
-
-    .leaderboard-item.is-me {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .leaderboard-rank {
-      width: 26px;
-      flex-shrink: 0;
-      text-align: center;
-      font-weight: 800;
-      font-size: 14px;
-      color: var(--text-dim);
-    }
-
-    .leaderboard-name {
-      flex: 1;
-      min-width: 0;
-      font-weight: 700;
-      font-size: 13.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .leaderboard-you {
-      color: var(--accent);
-      font-weight: 800;
-    }
-
-    .leaderboard-points {
-      flex-shrink: 0;
-      font-size: 12.5px;
-      font-weight: 800;
-      color: var(--accent-2);
-      white-space: nowrap;
-    }
-
     .attendance-modal-list {
       display: grid;
       gap: 18px;
@@ -2028,13 +1981,6 @@
         </svg>
         <span>الواجبات</span>
       </div>
-      <div class="student-menu-card" onclick="renderLeaderboard(); showStudentSection('leaderboard')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z" />
-          <path d="M7 6H4a2 2 0 0 0 0 4h1M17 6h3a2 2 0 0 1 0 4h-1" />
-        </svg>
-        <span>لوحة الصدارة</span>
-      </div>
       <div class="student-menu-card is-soon" onclick="window.mcToast('قريباً 🎮')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M6 12h4M8 10v4" />
@@ -2088,15 +2034,6 @@
       <button type="button" class="btn btn-primary" onclick="addTodoItem()">إضافة</button>
     </div>
     <div class="student-full-page-body" id="studentTodoList"></div>
-  </section>
-
-  <section class="student-full-page" id="studentLeaderboardPage" aria-labelledby="studentLeaderboardPageTitle">
-    <div class="student-full-page-head">
-      <button class="icon-btn" type="button" onclick="showStudentSection('menu')" aria-label="back">&rarr;</button>
-      <h2 id="studentLeaderboardPageTitle">لوحة الصدارة</h2>
-    </div>
-    <p class="muted" style="font-size:12.5px; margin-bottom:14px;">الترتيب داخل صفك بناءً على الدرجات والحضور</p>
-    <div class="student-full-page-body" id="studentLeaderboardList"></div>
   </section>
 
   <nav class="student-bottom-nav" aria-label="student navigation">
@@ -2332,7 +2269,7 @@
 
     window.showStudentSection = function (section) {
       var shell = document.querySelector('.student-page .shell');
-      var pages = ['grades', 'attendance', 'notes', 'menu', 'todo', 'homework', 'leaderboard'];
+      var pages = ['grades', 'attendance', 'notes', 'menu', 'todo', 'homework'];
       setStudentNavActive(section);
       if (section === 'home') {
         shell.style.display = '';
@@ -2582,23 +2519,6 @@
       }).join('');
     };
 
-    window.renderLeaderboard = function () {
-      var list = document.getElementById('studentLeaderboardList');
-      if (!list || !student) return;
-      var ranking = window.getLeaderboardForClass(student.classId);
-      if (!ranking.length) { list.innerHTML = '<div class="empty-state">' + window.t('leaderboardEmpty') + '</div>'; return; }
-      var medals = ['🥇', '🥈', '🥉'];
-      list.innerHTML = ranking.map(function (entry, i) {
-        var isMe = entry.student.id === student.id;
-        return '<div class="leaderboard-item' + (isMe ? ' is-me' : '') + '">' +
-          '<div class="leaderboard-rank">' + (medals[i] || (i + 1)) + '</div>' +
-          '<div class="avatar">' + (entry.student.avatar ? '<img src="' + entry.student.avatar + '">' : window.initials(entry.student.name)) + '</div>' +
-          '<div class="leaderboard-name">' + escapeHtml(entry.student.name) + (isMe ? ' <span class="leaderboard-you">(' + window.t('you') + ')</span>' : '') + '</div>' +
-          '<div class="leaderboard-points">' + entry.points + ' ' + window.t('points') + '</div>' +
-          '</div>';
-      }).join('');
-    };
-
     function renderCommunications() {
       var notifications = window.getNotifications(student.id), count = document.getElementById('notificationCount');
       var readIds = getReadNotificationIds();
@@ -2718,15 +2638,14 @@
       renderProgressChart();
       renderCommunications();
 
-      window.onMCUpdate('attendance', function () { renderStats(); renderMonthly(); renderLeaderboard(); });
-      window.onMCUpdate('grades', function () { renderGradesFeatured(); renderGradesTable(); renderLatestGrades(); renderProgressChart(); renderCommunications(); renderLeaderboard(); });
+      window.onMCUpdate('attendance', function () { renderStats(); renderMonthly(); });
+      window.onMCUpdate('grades', function () { renderGradesFeatured(); renderGradesTable(); renderLatestGrades(); renderProgressChart(); renderCommunications(); });
       window.onMCUpdate('homework', renderCommunications);
       window.onMCUpdate('notes', renderCommunications);
       window.onMCUpdate('notifications', renderCommunications);
       window.onMCUpdate('students', function () {
         var fresh = window.getStudentById(session.studentId);
         if (fresh) { student = fresh; renderProfile(); }
-        renderLeaderboard();
       });
     });
 
